@@ -9,20 +9,20 @@ import ChatContainer from './component/ChatContainer'
 import RightSideBar from './component/RightSideBar'
 
 function App() {
-
+const [userSelected,setUserSelected] =  useState(false)
   return (
     <>
-  <Routes>
-    <Route path='/login' element={<Login/>}/>
-    <Route path='/enter' element={
-         <div className='h-screen flex'>
-           <LeftSideBar/>
-        <ChatContainer/>
-        <RightSideBar/>
-         </div>
-    }/>
-     
-  </Routes>
+      <Routes>
+        <Route path='/login' element={<Login />} />
+        <Route path='/enter' element={
+          <div className='h-screen flex'>
+            <LeftSideBar setUserSelected={setUserSelected}   />
+            <ChatContainer userSelected={userSelected} />
+            {userSelected && <RightSideBar />}
+          </div>
+        } />
+
+      </Routes>
     </>
   )
 }

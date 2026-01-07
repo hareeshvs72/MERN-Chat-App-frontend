@@ -1,6 +1,6 @@
 import React from "react";
 
-const LeftSideBar = () => {
+const LeftSideBar = ({setUserSelected}) => {
   return (
     
    <>
@@ -28,7 +28,7 @@ const LeftSideBar = () => {
           <div className="flex-1 space-y-2 overflow-y-auto scrollbar-thin left-sidebar ">
     
             {[1, 2, 3, 4, 5,6,7,8,9,].map((user) => (
-              <div
+              <div onClick={()=>setUserSelected(true)}
                 key={user}
                 className="flex items-center gap-3 p-3 rounded-xl 
                            cursor-pointer transition

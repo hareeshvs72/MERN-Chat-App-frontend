@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { loginAPI, signUpAPi } from '../Services/allApi';
 
 const Login = () => {
 
@@ -7,7 +8,66 @@ const Login = () => {
         username:"",email:"",password:"",cPassword:""
     })
     console.log(userDetail);
-    
+    // handile signup
+    const handileSignUp = async ()=>{
+        const {username,email,password,cPassword} =  userDetail
+    try {
+          if(!username || !email || !password || !cPassword){
+        alert("please fill the form Completely")
+      }else{
+        if(password === cPassword){
+            const result = await signUpAPi(userDetail)
+            console.log(result);
+            if(result.status == 200){   
+                alert("Sign Up SuccessFully")
+                setUserDetail({
+                    username:"",email:"",password:"",cPassword:""
+                })
+            }else{
+                 alert(result.response.data)
+                  setUserDetail({
+                    username:"",email:"",password:"",cPassword:""
+                })
+            }
+            
+        }
+        else{
+            alert("Password Incorrect")
+              setUserDetail({
+                   password:"",cPassword:""
+                })
+        }
+      }
+    } catch (error) {
+        console.log(error);
+        
+    }
+    }
+// handile login
+ const handileLogin = async()=>{
+    const {email,password} =  userDetail 
+
+   try {
+     if(!email || !password ){
+        alert("pleae Fill The Form")
+    }else{
+        const result = await loginAPI(userDetail)
+        console.log(result);
+        
+        if(result.status == 200){
+            alert("logined SuccessFully")
+        }
+  
+         else {
+            alert(result.response.data)
+        }
+       
+    }
+   } catch (error) {
+    console.log(error);
+   }
+
+ }
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-black relative overflow-hidden">
 
@@ -77,13 +137,15 @@ const Login = () => {
                         </div>}
                  {isActive ?
                     <button
-                        type="submit"
+                        type="button"
+                        onClick={handileSignUp}
                         className="w-full mt-4 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold hover:opacity-90 transition shadow-lg"
                     >
                         SignUp
                     </button>
                  :   <button
-                        type="submit"
+                 onClick={handileLogin}
+                        type="button"
                         className="w-full mt-4 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold hover:opacity-90 transition shadow-lg"
                     >
                         Login
@@ -98,7 +160,7 @@ const Login = () => {
                         Sign In
                     </span>
                     :
-                   <span onClick={() => setActive(true)} className="text-blue-400 cursor-pointer hover:underline">
+                   <span  onClick={() => setActive(true) } className="text-blue-400 cursor-pointer hover:underline">
                         Sign up
                     </span>}
                 </p>
