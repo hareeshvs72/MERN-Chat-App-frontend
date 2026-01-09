@@ -7,17 +7,21 @@ import Login from './pages/Login'
 import LeftSideBar from './component/LeftSideBar'
 import ChatContainer from './component/ChatContainer'
 import RightSideBar from './component/RightSideBar'
+import LandingPage from './component/Landing'
 
 function App() {
 const [userSelected,setUserSelected] =  useState(false)
+const [selecteduser,setSelectedUser] = useState(null)
   return (
     <>
       <Routes>
+                <Route path='/' element={<LandingPage />} />
+
         <Route path='/login' element={<Login />} />
         <Route path='/enter' element={
           <div className='h-screen flex'>
-            <LeftSideBar setUserSelected={setUserSelected}   />
-            <ChatContainer userSelected={userSelected} />
+            <LeftSideBar setUserSelected={setUserSelected} setSelectedUser={setSelectedUser}   />
+            <ChatContainer userSelected={userSelected} selecteduser={selecteduser} />
             {userSelected && <RightSideBar />}
           </div>
         } />

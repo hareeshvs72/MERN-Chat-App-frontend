@@ -1,6 +1,40 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { getUserForSidebarAPI } from "../Services/allApi";
+import { useState } from "react";
 
-const LeftSideBar = ({setUserSelected}) => {
+const LeftSideBar = ({setUserSelected,setSelectedUser}) => {
+ const [users,setUSers ] = useState([])
+ 
+  useEffect(()=>{
+   const token = sessionStorage.getItem("token")
+   console.log(token);
+ 
+   if(token){
+
+      const reqHeaders = {
+    Authorization : `Bearer ${token}` 
+   }
+    if(users.length === 0)   handileUserSidebar(reqHeaders)
+ 
+
+   }
+   
+  },[])
+
+  const handileUserSidebar = async (reqHeaders)=>{
+    const result = await getUserForSidebarAPI(reqHeaders)
+    console.log(result);
+    if(result.status == 200){
+      console.log(result.data.users);
+      
+      setUSers(result.data.users)
+
+    }
+  }
+    useEffect(() => {
+    console.log("STATE USERS:", users); // ✅ correct check
+  }, [users]);
+
   return (
     
    <>
@@ -27,8 +61,9 @@ const LeftSideBar = ({setUserSelected}) => {
           {/* User List */}
           <div className="flex-1 space-y-2 overflow-y-auto scrollbar-thin left-sidebar ">
     
-            {[1, 2, 3, 4, 5,6,7,8,9,].map((user) => (
-              <div onClick={()=>setUserSelected(true)}
+            {users?.length>0 &&
+            users.map((user) => (
+              <div onClick={()=>{setUserSelected(true);setSelectedUser(user)}}
                 key={user}
                 className="flex items-center gap-3 p-3 rounded-xl 
                            cursor-pointer transition
@@ -49,7 +84,7 @@ const LeftSideBar = ({setUserSelected}) => {
                 {/* User Info */}
                 <div className="flex-1">
                   <p className="text-white font-medium leading-tight">
-                    User {user}
+                    {user.username}
                   </p>
                   <p className="text-white/60 text-sm truncate">
                     Last message...
