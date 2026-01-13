@@ -21,3 +21,7 @@ export const sendMessageApi = async(reqBody,reqHeader)=>{
 export const getMessageApi = async(reciverId,reqHeader)=>{
   return await  commonApi("GET",`${SERVERURL}/${reciverId}`,{},reqHeader)
 }
+
+export const messageSeenAPI = async(senderId,reqHeader)=>{
+  return await  commonApi("PUT",`${SERVERURL}/seen/${senderId}`,{},reqHeader)
+}
