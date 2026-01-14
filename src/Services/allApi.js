@@ -25,3 +25,7 @@ export const getMessageApi = async(reciverId,reqHeader)=>{
 export const messageSeenAPI = async(senderId,reqHeader)=>{
   return await  commonApi("PUT",`${SERVERURL}/seen/${senderId}`,{},reqHeader)
 }
+export const updateProfileAPI = async (reqbody,reqHeader)=>{
+  return await  commonApi("PUT",`${SERVERURL}/update-profile`,reqbody,reqHeader)
+}
+

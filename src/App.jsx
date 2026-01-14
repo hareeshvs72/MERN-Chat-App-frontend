@@ -8,6 +8,7 @@ import LeftSideBar from './component/LeftSideBar'
 import ChatContainer from './component/ChatContainer'
 import RightSideBar from './component/RightSideBar'
 import LandingPage from './component/Landing'
+import EditProfile from './component/EditProfile'
 
 function App() {
 const [userSelected,setUserSelected] =  useState(false)
@@ -18,6 +19,7 @@ const [selecteduser,setSelectedUser] = useState(null)
                 <Route path='/' element={<LandingPage />} />
 
         <Route path='/login' element={<Login />} />
+        <Route path='/editProfile' element={<EditProfile />} />
         <Route path='/enter' element={
           <div className='h-screen flex'>
             <LeftSideBar setUserSelected={setUserSelected} setSelectedUser={setSelectedUser}   />
