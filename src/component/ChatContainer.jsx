@@ -133,7 +133,7 @@ const ChatContainer = ({ userSelected, selecteduser }) => {
   const getALlMessages = async () => {
     setLoading(true);
     const reqHeaders = { Authorization: `Bearer ${token}` };
-    const result = await getMessageApi(selecteduser._id, reqHeaders);
+    const result = await getMessageApi(selecteduser?._id, reqHeaders);
 
     if (result.status === 200) {
       setAllCHats(result.data.message);
@@ -144,7 +144,9 @@ const ChatContainer = ({ userSelected, selecteduser }) => {
   /* ================= MARK SEEN ================= */
   const markSeen = async () => {
     const reqHeaders = { Authorization: `Bearer ${token}` };
-    await messageSeenAPI(selecteduser._id, reqHeaders);
+    const result = await messageSeenAPI(selecteduser?._id, reqHeaders);
+    console.log(result);
+    
   };
 
   return (

@@ -1,36 +1,72 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { Route, Routes } from 'react-router-dom'
-import Login from './pages/Login'
-import LeftSideBar from './component/LeftSideBar'
-import ChatContainer from './component/ChatContainer'
-import RightSideBar from './component/RightSideBar'
-import LandingPage from './component/Landing'
-import EditProfile from './component/EditProfile'
+import { useState } from "react";
+import { Route, Routes } from "react-router-dom";
+
+import Login from "./pages/Login";
+import LeftSideBar from "./component/LeftSideBar";
+import ChatContainer from "./component/ChatContainer";
+import RightSideBar from "./component/RightSideBar";
+import LandingPage from "./component/Landing";
+import EditProfile from "./component/EditProfile";
+import Pnf from "./pages/Pnf";
+
+import ProtectedRoute from "./pages/ProtectedRoute";
+import PublicRoute from "./pages/PublicRoute ";
 
 function App() {
-const [userSelected,setUserSelected] =  useState(false)
-const [selecteduser,setSelectedUser] = useState(null)
+  const [userSelected, setUserSelected] = useState(false);
+  const [selecteduser, setSelectedUser] = useState(null);
+
   return (
-    <>
-      <Routes>
-                <Route path='/' element={<LandingPage />} />
+    <Routes>
+      {/* ===== PUBLIC ROUTES ===== */}
+      <Route path="/" element={<LandingPage />} />
 
-        <Route path='/login' element={<Login />} />
-        <Route path='/editProfile' element={<EditProfile />} />
-        <Route path='/enter' element={
-          <div className='h-screen flex'>
-            <LeftSideBar setUserSelected={setUserSelected} setSelectedUser={setSelectedUser}   />
-            <ChatContainer userSelected={userSelected} selecteduser={selecteduser} />
-            {userSelected && <RightSideBar />}
-          </div>
-        } />
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+      />
 
-      </Routes>
-    </>
-  )
+      {/* ===== PROTECTED ROUTES ===== */}
+      <Route
+        path="/enter"
+        element={
+          <ProtectedRoute>
+            <div className="h-screen flex">
+              <LeftSideBar
+                setUserSelected={setUserSelected}
+                setSelectedUser={setSelectedUser}
+              />
+
+              <ChatContainer
+                userSelected={userSelected}
+                selecteduser={selecteduser}
+              />
+
+              {userSelected && (
+                <RightSideBar selecteduser={selecteduser} />
+              )}
+            </div>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/editProfile"
+        element={
+          <ProtectedRoute>
+            <EditProfile />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ===== PAGE NOT FOUND ===== */}
+      <Route path="*" element={<Pnf />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
