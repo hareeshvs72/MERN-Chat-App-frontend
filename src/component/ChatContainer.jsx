@@ -27,6 +27,13 @@ const ChatContainer = ({ userSelected, selecteduser }) => {
     return () => socket.off("connect", handleConnect);
   }, [loggedInUserIds]);
 
+  useEffect(() => {
+  const user = JSON.parse(sessionStorage.getItem("user"));
+  if (user?._id) {
+    socket.emit("userOnline", user._id);
+    console.log("🟢 userOnline emitted:", user._id);
+  }
+}, []);
   /* ================= ONLINE USERS ================= */
   useEffect(() => {
     socket.on("onlineUsers", setOnlineUsers);

@@ -29,3 +29,17 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.3) transparent;
 }
+
+/* media scrolll bar */
+.media-container::-webkit-scrollbar {
+  width: 3px;
+}
+
+.media-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+.media-container::-webkit-scrollbar-track {
+  background: transparent;
+}

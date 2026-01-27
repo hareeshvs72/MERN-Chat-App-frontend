@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMessageApi } from "../Services/allApi";
+import { socket } from "../Services/socket";
+
 
 const RightSideBar = ({ selecteduser }) => {
   const [bio, setBio] = useState("");
@@ -9,6 +11,31 @@ const RightSideBar = ({ selecteduser }) => {
   const [image, setImage] = useState("");
 
   const navigate = useNavigate();
+
+useEffect(() => {
+  if (!selecteduser?._id) return;
+
+  const handleReceiveMessage = (newMessage) => {
+    const isCurrentChat =
+      newMessage.senderId === selecteduser._id ||
+      newMessage.receiverId === selecteduser._id;
+
+    if (isCurrentChat && newMessage.image) {
+      setMedia((prev) =>
+        prev.includes(newMessage.image)
+          ? prev
+          : [newMessage.image, ...prev]
+      );
+    }
+  };
+
+  socket.on("receiveMessage", handleReceiveMessage);
+
+  return () => {
+    socket.off("receiveMessage", handleReceiveMessage);
+  };
+}, [selecteduser?._id]);
+
 
   /* ================= LOGGED-IN USER INFO ================= */
   useEffect(() => {
@@ -21,44 +48,68 @@ const RightSideBar = ({ selecteduser }) => {
   }, []);
 
   /* ================= FETCH MEDIA WHEN USER CHANGES ================= */
-  useEffect(() => {
-    console.log("RightSideBar selected user id:", selecteduser?._id);
+useEffect(() => {
+  setMedia([]);       
+  if (selecteduser?._id) {
+    handleMedia();
+  }
+}, [selecteduser?._id]);
 
-    if (selecteduser?._id) {
-      handleMedia();
-    }
-  }, [selecteduser?._id]); // ✅ IMPORTANT FIX
 
   /* ================= FETCH MEDIA ================= */
-  const handleMedia = async () => {
-    console.log("handleMedia called");
+  // const handleMedia = async () => {
+  //   console.log("handleMedia called");
 
-    const token = sessionStorage.getItem("token");
-    console.log("TOKEN:", token);
+  //   const token = sessionStorage.getItem("token");
+  //   console.log("TOKEN:", token);
 
-    if (!token) return;
+  //   if (!token) return;
 
-    try {
-      const reqHeaders = {
-        Authorization: `Bearer ${token}`,
-      };
+  //   try {
+  //     const reqHeaders = {
+  //       Authorization: `Bearer ${token}`,
+  //     };
 
-      console.log("Calling getMessageApi...");
-      const result = await getMessageApi(selecteduser._id, reqHeaders);
-      console.log("API RESULT:", result);
+  //     console.log("Calling getMessageApi...");
+  //     const result = await getMessageApi(selecteduser._id, reqHeaders);
+  //     console.log("API RESULT:", result);
 
-      // ✅ support both { messages: [] } and [] responses
-      const messages = result.data.messages || result.data;
+  //     // ✅ support both { messages: [] } and [] responses
+  //     const messages = result.data.message
+  //       console.log("message from medai", messages);
+        
+  //     const mediaMessages = messages?.filter((msg) => msg.image ).map((img)=>img.image)
+  //   console.log("mediaMessages",mediaMessages);
+    
+  //     setMedia(mediaMessages);
+  //     console.log("media ," ,media);
+      
+  //   } catch (error) {
+  //     console.log("MEDIA ERROR:", error);
+  //   }
+  // };
+const handleMedia = async () => {
+  const token = sessionStorage.getItem("token");
+  if (!token || !selecteduser?._id) return;
 
-      const mediaMessages = messages
-        .filter((msg) => msg.image && msg.image.length > 0)
-        .map((msg) => `http://localhost:3000/${msg.image}`); // ✅ FULL URL
+  try {
+    const reqHeaders = {
+      Authorization: `Bearer ${token}`,
+    };
 
-      setMedia(mediaMessages);
-    } catch (error) {
-      console.log("MEDIA ERROR:", error);
-    }
-  };
+    const result = await getMessageApi(selecteduser._id, reqHeaders);
+
+    const messages = result.data.message || [];
+
+    const mediaMessages = messages
+      .filter((msg) => msg.image)
+      .map((msg) => msg.image);
+
+    setMedia(mediaMessages);
+  } catch (error) {
+    console.log("MEDIA ERROR:", error);
+  }
+};
 
   return (
     <aside
@@ -104,30 +155,40 @@ const RightSideBar = ({ selecteduser }) => {
       </div>
 
       {/* ================= MEDIA ================= */}
-      <div>
-        <h4 className="text-white font-semibold mb-3">Media</h4>
+     {/* ================= MEDIA ================= */}
+<div className="">
+  <h4 className="text-white font-semibold mb-3">Media</h4>
 
-        {media.length > 0 ? (
-          <div className="grid grid-cols-3 gap-2">
-            {media.map((item, index) => (
-              <img
-                key={index}
-                src={item}
-                alt="media"
-                className="
-                  w-full h-20 object-cover rounded-lg
-                  border border-white/20
-                  hover:opacity-80 transition cursor-pointer
-                "
-              />
-            ))}
-          </div>
-        ) : (
-          <p className="text-white/50 text-sm text-center mt-4">
-            No media shared yet
-          </p>
-        )}
-      </div>
+  {media?.length > 0 ? (
+    <div
+      className="
+        grid grid-cols-3 gap-2
+        max-h-60
+        overflow-y-auto
+        pr-1
+        media-container
+      "
+    >
+      {media.map((item, index) => (
+        <img
+          key={index}
+          src={item}
+          alt="media"
+          className="
+            w-full h-20 object-cover rounded-lg
+            border border-white/20
+            hover:opacity-80 transition cursor-pointer
+          "
+        />
+      ))}
+    </div>
+  ) : (
+    <p className="text-white/50 text-sm text-center mt-4">
+      No media shared yet
+    </p>
+  )}
+</div>
+
     </aside>
   );
 };
