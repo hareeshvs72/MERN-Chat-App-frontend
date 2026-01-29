@@ -67,18 +67,19 @@ const ChatContainer = ({ userSelected, selecteduser }) => {
   useEffect(() => {
     if (!loggedInUserIds?._id) return;
 
-    const handleSeen = ({ senderId, receiverId }) => {
-      if (String(senderId) !== String(loggedInUserIds._id)) return;
+const handleSeen = ({ senderId, receiverId }) => {
+  if (String(receiverId) !== String(loggedInUserIds._id)) return;
 
-      setAllCHats((prev) =>
-        prev.map((msg) =>
-          String(msg.senderId) === String(senderId) &&
-          String(msg.receiverId) === String(receiverId)
-            ? { ...msg, status: "seen" }
-            : msg
-        )
-      );
-    };
+  setAllCHats(prev =>
+    prev.map(msg =>
+      String(msg.senderId) === String(loggedInUserIds._id) &&
+      String(msg.receiverId) === String(senderId)
+        ? { ...msg, status: "seen" }
+        : msg
+    )
+  );
+};
+
 
     socket.on("messagesSeen", handleSeen);
     return () => socket.off("messagesSeen", handleSeen);
@@ -100,11 +101,12 @@ const ChatContainer = ({ userSelected, selecteduser }) => {
   }, [selecteduser, token]);
 
   /* ================= MARK SEEN AFTER LOAD ================= */
-  useEffect(() => {
-    if (allChats.length && selecteduser?._id) {
-      markSeen();
-    }
-  }, [allChats]);
+useEffect(() => {
+  if (selecteduser?._id && token) {
+    markSeen();
+  }
+}, [selecteduser]);
+
 
   /* ================= IMAGE PREVIEW ================= */
   const handilePreview = (e) => {
@@ -142,19 +144,35 @@ const ChatContainer = ({ userSelected, selecteduser }) => {
     const reqHeaders = { Authorization: `Bearer ${token}` };
     const result = await getMessageApi(selecteduser?._id, reqHeaders);
 
-    if (result.status === 200) {
-      setAllCHats(result.data.message);
-      setLoading(false);
-    }
+   if (result.status === 200) {
+  const formatted = result.data.message.map(msg => ({
+    ...msg,
+    status: msg.seen ? "seen" : "delivered"
+  }));
+
+  setAllCHats(formatted);
+  setLoading(false);
+}
+
   };
 
   /* ================= MARK SEEN ================= */
-  const markSeen = async () => {
-    const reqHeaders = { Authorization: `Bearer ${token}` };
-    const result = await messageSeenAPI(selecteduser?._id, reqHeaders);
-    console.log(result);
-    
-  };
+ const markSeen = async () => {
+  const reqHeaders = { Authorization: `Bearer ${token}` };
+  const result = await messageSeenAPI(selecteduser?._id, reqHeaders);
+
+  if (result.status === 200) {
+    setAllCHats(prev =>
+      prev.map(msg =>
+        String(msg.senderId) === String(selecteduser._id) &&
+        String(msg.receiverId) === String(loggedInUserIds._id)
+          ? { ...msg, status: "seen" }
+          : msg
+      )
+    );
+  }
+};
+
 
   return (
     <>
@@ -316,6 +334,8 @@ const ChatContainer = ({ userSelected, selecteduser }) => {
             >
               Send
             </button>
+                          <div ref={bottomRef}></div>
+
           </div>
         </main>
       ) : (
